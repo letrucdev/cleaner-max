@@ -1,0 +1,22 @@
+{
+  "v": 3,
+  "createdOnFiles": {"v": 1, "at": "2026-11-06T10:00:00Z"},
+  "title": "Disk Cleaner — UI Design",
+  "launch": {"view": "canvas"},
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {"x": 0, "y": 0, "w": 1280, "h": 860, "title": "Tổng quan", "expand": "fill", "is_interactive": true},
+    "Caches.dc.html": {"x": 1360, "y": 0, "w": 1280, "h": 860, "title": "Cache dev", "expand": "fill", "is_interactive": true},
+    "Projects.dc.html": {"x": 2720, "y": 0, "w": 1280, "h": 860, "title": "Dự án cũ", "expand": "fill", "is_interactive": true},
+    "System.dc.html": {"x": 0, "y": 980, "w": 1280, "h": 860, "title": "Hệ thống & Admin", "expand": "fill", "is_interactive": true},
+    "History.dc.html": {"x": 1360, "y": 980, "w": 1280, "h": 860, "title": "Lịch sử", "expand": "fill", "is_interactive": true},
+    "Settings.dc.html": {"x": 2720, "y": 980, "w": 1280, "h": 860, "title": "Cài đặt", "expand": "fill", "is_interactive": true},
+    "Confirm.dc.html": {"x": 0, "y": 1960, "w": 1280, "h": 860, "title": "Xác nhận & tiến trình xóa", "expand": "fill", "is_interactive": true},
+    "MainDark.dc.html": {"x": 1360, "y": 1960, "w": 1280, "h": 860, "title": "Tổng quan — Dark", "expand": "fill", "is_interactive": true}
+  },
+  "order": ["Main.dc.html", "Caches.dc.html", "Projects.dc.html", "System.dc.html", "History.dc.html", "Settings.dc.html", "Confirm.dc.html", "MainDark.dc.html"],
+  "notes": {
+    "title": {"x": 0, "y": -300, "text": "Disk Cleaner — Windows · WSL · Docker", "kind": "title1", "maxW": 4000}
+  },
+  "designSystems": []
+}

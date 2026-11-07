@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Disk Cleaner — Xác nhận xóa</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@keyframes dc-spin{to{transform:rotate(360deg)}}
+@keyframes dc-sheet{from{opacity:0;transform:translateY(16px) scale(0.98)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+</helmet>
+<div style="position: relative; min-height: 860px; overflow: hidden; color: {{t.text}}; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, 'Segoe UI Variable Text', sans-serif; -webkit-font-smoothing: antialiased">
+  <div aria-hidden="true">
+    <dc-import name="Caches" dark="{{dark}}" hint-size="100%,860px"></dc-import>
+  </div>
+  <div style="position: absolute; inset: 0; background: {{t.scrim}}; backdrop-filter: blur(3px); display: flex; justify-content: center; align-items: flex-start; padding: 88px 16px 16px">
+    <div role="dialog" aria-modal="true" aria-labelledby="dlg-title" style="width: 100%; max-width: 560px; box-sizing: border-box; background: {{t.sheet}}; border: 1px solid {{t.border}}; border-radius: 18px; box-shadow: 0 30px 80px rgba(0,0,0,0.30), 0 2px 8px rgba(0,0,0,0.10); padding: 24px; display: flex; flex-direction: column; gap: 18px; animation: dc-sheet 320ms cubic-bezier(0.2, 0.9, 0.3, 1.1)">
+
+      <sc-if value="{{isConfirm}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-direction: column; gap: 18px">
+          <div style="display: flex; gap: 14px; align-items: flex-start">
+            <div aria-hidden="true" style="width: 44px; height: 44px; border-radius: 12px; background: {{t.redSoft}}; display: flex; align-items: center; justify-content: center; flex: none">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{t.redText}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16 M9 7V4h6v3 M6 7l1 13h10l1-13 M10 11v6 M14 11v6"></path></svg>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <h2 id="dlg-title" style="margin: 0; font-size: 17px; font-weight: 700">Xóa vĩnh viễn 9 mục?</h2>
+              <p style="margin: 0; font-size: 13px; line-height: 1.45; color: {{t.text2}}">Sẽ giải phóng <strong style="color: {{t.text}}">17,2 GB</strong>. Không thể hoàn tác — các công cụ sẽ tự tải lại cache khi cần.</p>
+            </div>
+          </div>
+          <ul style="list-style: none; margin: 0; padding: 4px 0; max-height: 300px; overflow-y: auto; border: 1px solid {{t.border}}; border-radius: 12px; background: {{t.inset}}">
+            <sc-for list="{{items}}" as="i" hint-placeholder-count="9">
+              <li style="display: flex; align-items: center; gap: 10px; padding: 7px 14px; font-size: 13px">
+                <span style="font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 5px; background: {{t.fill}}; color: {{t.text2}}; width: 52px; text-align: center; flex: none">{{i.where}}</span>
+                <span style="flex: 1; min-width: 0">{{i.name}}</span>
+                <span style="font-variant-numeric: tabular-nums; color: {{t.text2}}">{{i.size}}</span>
+              </li>
+            </sc-for>
+          </ul>
+          <div style="display: flex; gap: 8px; align-items: flex-start; font-size: 12px; color: {{t.orangeText}}">
+            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 1px"><path d="M12 9v4 M12 17h.01 M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg>
+            <span>Bỏ qua 1 mục: Model AI của Chrome (4,0 GB) — Chrome đang mở.</span>
+          </div>
+          <div style="display: flex; justify-content: flex-end; gap: 8px">
+            <a href="Caches.dc.html" style="display: inline-flex; align-items: center; height: 36px; padding: 0 16px; border-radius: 9px; border: 1px solid {{t.border}}; background: {{t.card}}; color: {{t.text}}; text-decoration: none; font-size: 13px; font-weight: 500">Hủy</a>
+            <button type="button" onClick="{{start}}" style="height: 36px; padding: 0 18px; border: 0; border-radius: 9px; background: {{t.red}}; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 600">Xóa 17,2 GB</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isProgress}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 16px">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <h2 style="margin: 0; font-size: 17px; font-weight: 700">Đang dọn…</h2>
+            <p style="margin: 0; font-size: 13px; color: {{t.text2}}">10,6 / 17,2 GB · khoảng 40 giây nữa</p>
+          </div>
+          <div role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="62" aria-label="Tiến độ dọn dẹp" style="height: 8px; border-radius: 4px; background: {{t.fill}}; overflow: hidden">
+            <div style="width: 62%; height: 8px; border-radius: 4px; background: {{t.accent}}"></div>
+          </div>
+          <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px">
+            <sc-for list="{{progress}}" as="p" hint-placeholder-count="6">
+              <li style="display: flex; align-items: center; gap: 10px; min-height: 30px; font-size: 13px; color: {{p.color}}">
+                <sc-if value="{{p.done}}" hint-placeholder-val="{{ true }}">
+                  <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{t.greenText}}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg>
+                </sc-if>
+                <sc-if value="{{p.running}}" hint-placeholder-val="{{ false }}">
+                  <span aria-hidden="true" style="width: 14px; height: 14px; margin: 1px; border-radius: 50%; border: 2px solid {{t.fill}}; border-top-color: {{t.accent}}; box-sizing: border-box; animation: dc-spin 0.8s linear infinite"></span>
+                </sc-if>
+                <sc-if value="{{p.pending}}" hint-placeholder-val="{{ false }}">
+                  <span aria-hidden="true" style="width: 8px; height: 8px; margin: 4px; border-radius: 50%; background: {{t.fill}}"></span>
+                </sc-if>
+                <span style="flex: 1">{{p.name}}</span>
+                <span style="font-size: 12px; color: {{t.text2}}; font-variant-numeric: tabular-nums">{{p.detail}}</span>
+              </li>
+            </sc-for>
+          </ul>
+          <div style="display: flex; justify-content: flex-end; gap: 8px">
+            <button type="button" onClick="{{finish}}" style="height: 36px; padding: 0 16px; border-radius: 9px; border: 1px solid {{t.border}}; background: {{t.card}}; color: {{t.text}}; font: inherit; font-size: 13px; font-weight: 500">Dừng sau mục này</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isDone}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; padding: 8px 0 0">
+          <div aria-hidden="true" style="width: 64px; height: 64px; border-radius: 50%; background: {{t.greenSoft}}; display: flex; align-items: center; justify-content: center">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="{{t.greenText}}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg>
+          </div>
+          <h2 style="margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.02em">Đã giải phóng 17,2 GB</h2>
+          <p style="margin: 0; font-size: 13px; color: {{t.text2}}">9 mục đã xóa · 1 mục bỏ qua · ổ C: còn 52 GB trống</p>
+          <div style="display: flex; gap: 8px; margin-top: 8px">
+            <a href="History.dc.html" style="display: inline-flex; align-items: center; height: 36px; padding: 0 16px; border-radius: 9px; border: 1px solid {{t.border}}; background: {{t.card}}; color: {{t.text}}; text-decoration: none; font-size: 13px; font-weight: 500">Xem lịch sử</a>
+            <a href="Main.dc.html" style="display: inline-flex; align-items: center; height: 36px; padding: 0 18px; border-radius: 9px; background: {{t.accent}}; color: #FFFFFF; text-decoration: none; font-size: 13px; font-weight: 600">Xong</a>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"step":{"editor":"enum","options":["confirm","progress","done"],"default":"confirm"},"$preview":{"width":1280,"height":860}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { step: null };
+  }
+  renderVals() {
+    const dark = this.props.dark ?? false;
+    const step = this.state.step ?? this.props.step ?? 'confirm';
+    const t = dark ? {
+      text: '#F5F5F7', text2: '#A1A1A6', card: '#3A3A3C', sheet: '#2C2C2E', inset: '#242426', border: 'rgba(255,255,255,0.08)',
+      fill: 'rgba(255,255,255,0.10)', accent: '#0071E3', scrim: 'rgba(0,0,0,0.45)',
+      red: '#D70015', redText: '#FF6961', redSoft: 'rgba(255,69,58,0.18)', orangeText: '#FF9F0A',
+      greenText: '#30D158', greenSoft: 'rgba(48,209,88,0.16)'
+    } : {
+      text: '#1D1D1F', text2: '#6E6E73', card: '#FFFFFF', sheet: '#FFFFFF', inset: '#F7F7F9', border: 'rgba(0,0,0,0.08)',
+      fill: 'rgba(0,0,0,0.06)', accent: '#0071E3', scrim: 'rgba(0,0,0,0.22)',
+      red: '#D70015', redText: '#D70015', redSoft: 'rgba(255,59,48,0.12)', orangeText: '#B33000',
+      greenText: '#1E7B34', greenSoft: 'rgba(52,199,89,0.14)'
+    };
+    const items = [
+      ['WSL', 'npm', '5,4 GB'], ['WSL', 'NuGet', '2,5 GB'], ['WSL', 'Playwright browsers', '1,3 GB'],
+      ['WSL', 'VS Code Server — VSIX đã tải', '624 MB'], ['WSL', 'pnpm (gói không dùng)', '492 MB'],
+      ['WSL', 'Electron, uv, Composer, node-gyp, TypeScript, pip', '666 MB'],
+      ['Windows', 'NuGet packages', '4,3 GB'], ['Windows', 'NuGet HTTP cache', '1,1 GB'], ['Windows', 'VS Code — cache', '973 MB']
+    ].map(([where, name, size]) => ({ where, name, size }));
+    const P = [
+      ['npm', 'done', '5,4 GB'], ['NuGet (WSL)', 'done', '2,5 GB'], ['Playwright browsers', 'done', '1,3 GB'],
+      ['VS Code Server — VSIX', 'done', '624 MB'], ['NuGet packages (Windows)', 'running', '18.240 / 41.502 tệp'],
+      ['NuGet HTTP cache', 'pending', ''], ['VS Code — cache', 'pending', ''], ['pnpm, cache khác', 'pending', '']
+    ];
+    const progress = P.map(([name, s, detail]) => ({
+      name, detail, done: s === 'done', running: s === 'running', pending: s === 'pending',
+      color: s === 'pending' ? t.text2 : t.text
+    }));
+    return {
+      t, dark, items, progress,
+      isConfirm: step === 'confirm', isProgress: step === 'progress', isDone: step === 'done',
+      start: () => this.setState({ step: 'progress' }),
+      finish: () => this.setState({ step: 'done' })
+    };
+  }
+}
+</script>
+</body>
+</html>

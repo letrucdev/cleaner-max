@@ -1,0 +1,246 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/inter";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design tokens — taken from the approved Claude Design canvas (docs/design/*.dc.html).
+ * Accent #0071E3 keeps white label text at ~4.6:1; accent-colored text uses --accent-text.
+ */
+@theme inline {
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter Variable", "Segoe UI Variable Text", "Segoe UI", sans-serif;
+  --font-heading: var(--font-sans);
+  --font-mono: "SF Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+  --color-window: var(--window);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-accent-text: var(--accent-text);
+  --color-fill: var(--fill);
+  --color-track: var(--track);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-fill: var(--warning-fill);
+  --color-warning-soft: var(--warning-soft);
+  --color-destructive-solid: var(--destructive-solid);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.6);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  --shadow-card: var(--card-shadow);
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+:root {
+  --radius: 0.625rem; /* 10px → cards 16px (2xl), buttons 9–10px */
+
+  --window: #f5f5f7;
+  --background: #f5f5f7;
+  --foreground: #1d1d1f;
+  --card: #ffffff;
+  --card-foreground: #1d1d1f;
+  --card-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 6px 20px rgb(0 0 0 / 0.05);
+  --popover: #ffffff;
+  --popover-foreground: #1d1d1f;
+  --primary: #0071e3;
+  --primary-foreground: #ffffff;
+  --secondary: rgb(0 0 0 / 0.05);
+  --secondary-foreground: #1d1d1f;
+  --muted: rgb(0 0 0 / 0.05);
+  --muted-foreground: #6e6e73;
+  --accent: rgb(0 0 0 / 0.05);
+  --accent-foreground: #1d1d1f;
+  --accent-text: #0066cc;
+  --fill: rgb(0 0 0 / 0.05);
+  --track: rgb(0 0 0 / 0.06);
+  --destructive: #d70015;
+  --destructive-solid: #d70015;
+  --success: #1e7b34;
+  --success-soft: rgb(52 199 89 / 0.14);
+  --warning: #b33000;
+  --warning-fill: #ff9500;
+  --warning-soft: rgb(255 149 0 / 0.14);
+  --border: rgb(0 0 0 / 0.07);
+  --input: rgb(0 0 0 / 0.12);
+  --ring: #0071e3;
+  --chart-1: #0071e3;
+  --chart-2: #ff9500;
+  --chart-3: #5e5ce6;
+  --chart-4: #8e8e93;
+  --chart-5: #30b0c7;
+
+  --sidebar: #ececef;
+  --sidebar-foreground: #1d1d1f;
+  --sidebar-border: rgb(60 60 67 / 0.12);
+  --sidebar-accent: rgb(0 0 0 / 0.07);
+  --sidebar-accent-foreground: #1d1d1f;
+  --sidebar-primary: #0071e3;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-ring: #0071e3;
+}
+
+.dark {
+  --window: #1c1c1e;
+  --background: #1c1c1e;
+  --foreground: #f5f5f7;
+  --card: #2c2c2e;
+  --card-foreground: #f5f5f7;
+  --card-shadow: 0 8px 24px rgb(0 0 0 / 0.3);
+  --popover: #2c2c2e;
+  --popover-foreground: #f5f5f7;
+  --primary: #0071e3;
+  --primary-foreground: #ffffff;
+  --secondary: rgb(255 255 255 / 0.08);
+  --secondary-foreground: #f5f5f7;
+  --muted: rgb(255 255 255 / 0.08);
+  --muted-foreground: #a1a1a6;
+  --accent: rgb(255 255 255 / 0.08);
+  --accent-foreground: #f5f5f7;
+  --accent-text: #4da3ff;
+  --fill: rgb(255 255 255 / 0.08);
+  --track: rgb(255 255 255 / 0.1);
+  --destructive: #ff6961;
+  --destructive-solid: #d70015;
+  --success: #30d158;
+  --success-soft: rgb(48 209 88 / 0.16);
+  --warning: #ff9f0a;
+  --warning-fill: #ff9f0a;
+  --warning-soft: rgb(255 159 10 / 0.16);
+  --border: rgb(255 255 255 / 0.08);
+  --input: rgb(255 255 255 / 0.15);
+  --ring: #4da3ff;
+  --chart-4: #636366;
+
+  --sidebar: #252527;
+  --sidebar-foreground: #f5f5f7;
+  --sidebar-border: rgb(255 255 255 / 0.09);
+  --sidebar-accent: rgb(255 255 255 / 0.1);
+  --sidebar-accent-foreground: #f5f5f7;
+}
+
+/*
+ * Mica active (Tauri on Windows 11): let the window material show through the sidebar.
+ * The native side follows the app theme (set_window_theme), so the tint always matches.
+ */
+html.vibrant {
+  --window: transparent;
+  --sidebar: rgb(240 240 243 / 0.72);
+}
+html.vibrant.dark {
+  --sidebar: rgb(37 37 39 / 0.6);
+}
+
+/* Theme switch: the new theme is revealed as a growing circle (see useAppearance.applyTheme). */
+html[data-theme-transition="reveal"]::view-transition-old(root),
+html[data-theme-transition="reveal"]::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+html[data-theme-transition="fade"]::view-transition-old(root),
+html[data-theme-transition="fade"]::view-transition-new(root) {
+  animation-duration: 200ms;
+}
+@media (prefers-reduced-transparency: reduce) {
+  html.vibrant {
+    --window: #f5f5f7;
+    --sidebar: #ececef;
+  }
+  html.vibrant.dark {
+    --window: #1c1c1e;
+    --sidebar: #252527;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans antialiased;
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-window text-foreground text-[13px];
+    margin: 0;
+    overflow: hidden;
+    -webkit-user-select: none;
+    user-select: none;
+    transition: background-color 200ms ease;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  /* Instant press feedback (respond on pointer-down). */
+  button:not(:disabled):active {
+    transform: scale(0.97);
+  }
+  button {
+    transition:
+      transform 160ms var(--ease-out-strong),
+      background-color 160ms ease,
+      opacity 160ms ease;
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background-clip: padding-box;
+    background-color: var(--track);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--muted-foreground);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button:not(:disabled):active {
+    transform: none;
+  }
+}

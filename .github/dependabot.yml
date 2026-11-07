@@ -1,0 +1,9 @@
+# Giữ các action đã pin theo SHA luôn được cập nhật.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: ci

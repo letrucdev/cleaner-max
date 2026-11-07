@@ -50,6 +50,8 @@ export const api = {
   },
   /** One UAC-elevated (or WSL/Docker-restarting) task. A declined prompt resolves as `skipped`. */
   adminTask: (task: AdminTask) => unwrap(commands.runAdminTask(task, useSettings.getState().recordHistory)),
+  /** Show a folder in File Explorer (`distro` for a Linux path inside WSL). */
+  openFolder: (path: string, distro: string | null = null) => unwrap(commands.openFolder(path, distro)),
 };
 
 export const queryKeys = {

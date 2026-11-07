@@ -49,7 +49,8 @@ export function useCleanupTotals() {
   }, [targets.data, targets.isPending, projects.data, projects.isPending, projects.fetchStatus, staleDays]);
 }
 
-/** The Windows system drive (where WSL/Docker disks live). */
+/** The drive Windows is installed on (reported by Rust, not assumed to be C:). */
 export function systemDrive(o: Overview | undefined) {
-  return o?.disks.find((d) => d.mount.toUpperCase().startsWith("C:")) ?? o?.disks[0];
+  const letter = o?.systemDrive.toUpperCase();
+  return (letter && o?.disks.find((d) => d.mount.toUpperCase().startsWith(letter))) || o?.disks[0];
 }

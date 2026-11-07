@@ -13,13 +13,14 @@ import { ArrowDown, ArrowUp, Folder, Plus, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import { PageHeader } from "@/components/app/PageHeader";
 import { SelectionBar } from "@/components/app/SelectionBar";
 import { Segmented } from "@/components/app/Segmented";
 import { EmptyState, ErrorState, ListSkeleton, PartialErrors } from "@/components/app/States";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import type { Project } from "@/lib/api";
+import { api, type Project } from "@/lib/api";
 import { formatBytes, formatDate, formatRelative } from "@/lib/format";
 import { itemVariants, spring } from "@/lib/motion";
 import { isStale, useProjectRoots, useProjectScan } from "@/lib/selectors";
@@ -141,6 +142,11 @@ export function ProjectsPage() {
       ),
     );
 
+  const openFolder = (p: Project) =>
+    api.openFolder(p.path, p.distro).catch((e: unknown) => {
+      toast.error(t("projects.openFailed"), { description: e instanceof Error ? e.message : String(e) });
+    });
+
   const sortState = (id: string) => table.getColumn(id)?.getIsSorted() ?? false;
   const toggleSort = (id: string) => table.getColumn(id)?.toggleSorting();
 
@@ -200,18 +206,26 @@ export function ProjectsPage() {
                     {table.getRowModel().rows.map((row) => {
                       const p = row.original;
                       const id = `p-${p.path}`;
+                      const where = p.distro ? `${p.distro}: ${p.path}` : p.path;
                       return (
                         <motion.tr layout="position" transition={spring} key={row.id} className={cn("border-t", p.active && "opacity-60")}>
                           <td className="py-3 pl-4">
                             <Checkbox id={id} aria-label={t("projects.select", { name: p.name })} checked={isOn(p)} disabled={p.active} onCheckedChange={() => toggle(p)} />
                           </td>
                           <td className="px-2 py-2.5">
-                            <label htmlFor={id} className="flex flex-col gap-0.5">
-                              <span className="font-semibold">{p.name}</span>
-                              <span className="max-w-85 truncate text-[12px] text-muted-foreground" title={p.path}>
-                                {p.distro ? `${p.distro}: ${p.path}` : p.path}
-                              </span>
-                            </label>
+                            <div className="flex max-w-85 flex-col items-start gap-0.5">
+                              <label htmlFor={id} className="font-semibold break-all">
+                                {p.name}
+                              </label>
+                              <Button
+                                variant="link"
+                                onClick={() => void openFolder(p)}
+                                title={t("projects.openFolder", { path: where })}
+                                className="h-auto max-w-full justify-start p-0 text-left text-[12px] font-normal whitespace-normal text-muted-foreground underline-offset-2 hover:text-accent-text"
+                              >
+                                <span className="line-clamp-3 min-w-0 break-all">{where}</span>
+                              </Button>
+                            </div>
                           </td>
                           <td className="px-2 py-2.5 whitespace-nowrap">
                             <div className="flex flex-col gap-0.5">
@@ -220,14 +234,14 @@ export function ProjectsPage() {
                             </div>
                           </td>
                           <td className="px-2 py-2.5">
-                            <div className="flex flex-wrap gap-1.5">
+                            <div className="flex min-w-44 flex-wrap gap-1.5">
                               {p.artifacts.map((a) => (
                                 <span key={a.path} title={formatBytes(a.size)} className="rounded-md bg-fill px-2 py-0.5 font-mono text-[12px] whitespace-nowrap">
                                   {a.name}
                                 </span>
                               ))}
                               {p.active && (
-                                <span className="rounded-full bg-success-soft px-2 py-0.5 text-[12px] font-semibold text-success">{t("projects.active")}</span>
+                                <span className="rounded-full bg-success-soft px-2 py-0.5 text-[12px] font-semibold whitespace-nowrap text-success">{t("projects.active")}</span>
                               )}
                             </div>
                           </td>

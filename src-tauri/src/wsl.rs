@@ -314,9 +314,36 @@ pub fn parse_unc(path: &str) -> Option<(String, String)> {
     Some((distro.to_string(), linux))
 }
 
+/// (`Ubuntu`, `/home/me`) → `\\wsl.localhost\Ubuntu\home\me`, the way Explorer reaches a distro.
+pub fn to_unc(distro: &str, linux: &str) -> Option<String> {
+    let distro_ok =
+        !distro.is_empty() && distro != "." && distro != ".." && !distro.contains(['\\', '/', ':']);
+    if !distro_ok || !linux.starts_with('/') {
+        return None;
+    }
+    let rest = linux.trim_matches('/').replace('/', "\\");
+    Some(format!(r"\\wsl.localhost\{distro}\{rest}"))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn linux_to_unc() {
+        assert_eq!(
+            to_unc("Ubuntu-24.04", "/home/neon/app"),
+            Some(r"\\wsl.localhost\Ubuntu-24.04\home\neon\app".into())
+        );
+        assert_eq!(
+            to_unc("Debian", "/"),
+            Some(r"\\wsl.localhost\Debian\".into())
+        );
+        assert_eq!(to_unc("Ubuntu", "home/me"), None);
+        assert_eq!(to_unc("..", "/etc"), None);
+        assert_eq!(to_unc(r"a\b", "/etc"), None);
+        assert_eq!(to_unc("", "/etc"), None);
+    }
 
     #[test]
     fn unc_paths() {

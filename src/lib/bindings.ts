@@ -32,6 +32,11 @@ export const commands = {
 	 *  A declined UAC prompt comes back as `skipped`.
 	 */
 	runAdminTask: (task: AdminTask, recordHistory: boolean) => typedError<ItemResult_Serialize, string>(__TAURI_INVOKE("run_admin_task", { task, recordHistory })),
+	/**
+	 *  Show a project folder in File Explorer. WSL projects (`distro` set, Linux `path`) are opened
+	 *  through `\\wsl.localhost`. Only existing directories are opened, never files.
+	 */
+	openFolder: (path: string, distro: string | null) => typedError<null, string>(__TAURI_INVOKE("open_folder", { path, distro })),
 };
 
 /* Types */
@@ -158,8 +163,10 @@ export type Overview = Overview_Serialize | Overview_Deserialize;
 export type Overview_Deserialize = {
 	disks: DiskInfo[],
 	virtualDisks: VirtualDisk[],
-	/**  Size of `C:\hiberfil.sys`; `None` when hibernation is off. */
+	/**  Size of `hiberfil.sys` on the system drive; `None` when hibernation is off. */
 	hiberfil?: number | null,
+	/**  Drive Windows is installed on (`C:`, `D:`…), where `hiberfil.sys` and the caches live. */
+	systemDrive: string,
 	recycleBin: RecycleBinInfo,
 	wslDistros: string[],
 	/**  `docker` CLI found on PATH. */
@@ -169,8 +176,10 @@ export type Overview_Deserialize = {
 export type Overview_Serialize = {
 	disks: DiskInfo[],
 	virtualDisks: VirtualDisk[],
-	/**  Size of `C:\hiberfil.sys`; `None` when hibernation is off. */
+	/**  Size of `hiberfil.sys` on the system drive; `None` when hibernation is off. */
 	hiberfil: number | null,
+	/**  Drive Windows is installed on (`C:`, `D:`…), where `hiberfil.sys` and the caches live. */
+	systemDrive: string,
 	recycleBin: RecycleBinInfo,
 	wslDistros: string[],
 	/**  `docker` CLI found on PATH. */

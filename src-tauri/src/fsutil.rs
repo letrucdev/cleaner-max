@@ -162,11 +162,40 @@ pub fn now_ms() -> f64 {
     epoch_ms(SystemTime::now())
 }
 
+/// The drive Windows is installed on, e.g. `C:` or `D:` (from `%SystemDrive%`, then `%windir%`).
+pub fn system_drive() -> String {
+    parse_drive(std::env::var("SystemDrive").ok().as_deref())
+        .or_else(|| parse_drive(std::env::var("windir").ok().as_deref()))
+        .unwrap_or_else(|| "C:".into())
+}
+
+/// `d:`, `D:\` or `D:\Windows` → `D:`; anything else → `None`.
+fn parse_drive(value: Option<&str>) -> Option<String> {
+    let mut chars = value?.trim().chars();
+    match (chars.next(), chars.next()) {
+        (Some(letter), Some(':')) if letter.is_ascii_alphabetic() => {
+            Some(format!("{}:", letter.to_ascii_uppercase()))
+        }
+        _ => None,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use std::fs::File;
     use std::io::Write;
+
+    #[test]
+    fn drive_letters() {
+        assert_eq!(parse_drive(Some("C:")), Some("C:".into()));
+        assert_eq!(parse_drive(Some("d:\\")), Some("D:".into()));
+        assert_eq!(parse_drive(Some(r"E:\Windows")), Some("E:".into()));
+        assert_eq!(parse_drive(Some("")), None);
+        assert_eq!(parse_drive(Some(r"\\server\share")), None);
+        assert_eq!(parse_drive(None), None);
+        assert!(system_drive().ends_with(':'));
+    }
 
     fn write(path: &Path, bytes: usize) {
         fs::create_dir_all(path.parent().unwrap()).unwrap();

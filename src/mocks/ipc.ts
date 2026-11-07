@@ -49,6 +49,7 @@ const overview: Overview_Serialize = {
     },
   ],
   hiberfil: 12.55 * GB,
+  systemDrive: "C:",
   recycleBin: { size: 6.17 * GB, items: 214 },
   wslDistros: [DISTRO],
   dockerCli: true,
@@ -220,7 +221,7 @@ export function installMockIpc() {
       case "set_window_theme":
         return null;
       case "run_admin_task": {
-        await wait(1500);
+        await wait(4000);
         const task = args.task as { kind: string };
         const r: ItemResult_Serialize = {
           key: `admin:${task.kind}`,
@@ -234,6 +235,13 @@ export function installMockIpc() {
       }
       case "plugin:dialog|open":
         return "D:\\dev";
+      case "open_folder":
+        console.info("[mock ipc] open folder", args.distro ?? "", args.path);
+        return null;
+      case "plugin:event|listen":
+        return 0;
+      case "plugin:event|unlisten":
+        return null;
       default:
         console.warn("[mock ipc] unhandled", cmd, payload);
         return null;

@@ -27,8 +27,7 @@ fn virtual_disk(kind: VirtualDiskKind, owner: &str, path: &Path) -> Option<Virtu
 }
 
 /// `hiberfil.sys` can't be opened, but its directory entry carries the size.
-fn hiberfil_size() -> Option<f64> {
-    let drive = std::env::var("SystemDrive").unwrap_or_else(|_| "C:".into());
+fn hiberfil_size(drive: &str) -> Option<f64> {
     std::fs::read_dir(format!("{drive}\\"))
         .ok()?
         .filter_map(Result::ok)
@@ -69,10 +68,12 @@ pub fn overview() -> Overview {
     }
     virtual_disks.sort_by(|a, b| b.size.total_cmp(&a.size));
 
+    let system_drive = fsutil::system_drive();
     Overview {
         disks,
         virtual_disks,
-        hiberfil: hiberfil_size(),
+        hiberfil: hiberfil_size(&system_drive),
+        system_drive,
         recycle_bin: recycle::query(),
         wsl_distros: distros.into_iter().map(|d| d.name).collect(),
         docker_cli: which::which("docker").is_ok(),

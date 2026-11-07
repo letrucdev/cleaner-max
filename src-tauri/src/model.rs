@@ -137,9 +137,11 @@ pub struct RecycleBinInfo {
 pub struct Overview {
     pub disks: Vec<DiskInfo>,
     pub virtual_disks: Vec<VirtualDisk>,
-    /// Size of `C:\hiberfil.sys`; `None` when hibernation is off.
+    /// Size of `hiberfil.sys` on the system drive; `None` when hibernation is off.
     #[specta(type = Option<Num>)]
     pub hiberfil: Option<f64>,
+    /// Drive Windows is installed on (`C:`, `D:`…), where `hiberfil.sys` and the caches live.
+    pub system_drive: String,
     pub recycle_bin: RecycleBinInfo,
     pub wsl_distros: Vec<String>,
     /// `docker` CLI found on PATH.

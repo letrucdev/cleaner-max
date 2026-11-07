@@ -18,7 +18,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 
 use tauri::ipc::Channel;
-use tauri::{AppHandle, Manager, State};
+use tauri::{AppHandle, Emitter, Manager, State};
 
 use crate::clean::ArtifactKey;
 use crate::model::{
@@ -32,7 +32,12 @@ struct AppState {
     allowed_artifacts: Arc<Mutex<HashSet<ArtifactKey>>>,
     /// Mica was applied to the main window (the page may then use a transparent background).
     vibrancy: AtomicBool,
+    /// An elevated task is running: the window refuses to close until it finishes.
+    admin_running: AtomicBool,
 }
+
+/// Emitted when the user tries to close the window while an elevated task is running.
+const CLOSE_BLOCKED_EVENT: &str = "close-blocked";
 
 /// Run blocking work off the async runtime.
 async fn blocking<T: Send + 'static>(f: impl FnOnce() -> T + Send + 'static) -> Result<T, String> {
@@ -121,11 +126,15 @@ async fn clean(
 #[specta::specta]
 async fn run_admin_task(
     app: AppHandle,
+    state: State<'_, AppState>,
     task: admin::AdminTask,
     record_history: bool,
 ) -> Result<model::ItemResult, String> {
     let started_at = fsutil::now_ms();
-    let result = blocking(move || admin::run(&task)).await?;
+    state.admin_running.store(true, Ordering::Relaxed);
+    let result = blocking(move || admin::run(&task)).await;
+    state.admin_running.store(false, Ordering::Relaxed);
+    let result = result?;
     if record_history && result.status != model::ItemStatus::Skipped {
         let report = CleanReport {
             dry_run: false,
@@ -176,6 +185,24 @@ async fn set_window_theme(
     Ok(())
 }
 
+/// Show a project folder in File Explorer. WSL projects (`distro` set, Linux `path`) are opened
+/// through `\\wsl.localhost`. Only existing directories are opened, never files.
+#[tauri::command]
+#[specta::specta]
+async fn open_folder(path: String, distro: Option<String>) -> Result<(), String> {
+    blocking(move || {
+        let dir = match distro {
+            Some(d) => wsl::to_unc(&d, &path).ok_or_else(|| format!("invalid WSL path: {path}"))?,
+            None => path,
+        };
+        if !std::path::Path::new(&dir).is_dir() {
+            return Err(format!("folder not found: {dir}"));
+        }
+        tauri_plugin_opener::open_path(&dir, None::<&str>).map_err(|e| e.to_string())
+    })
+    .await?
+}
+
 /// Past clean runs, newest first.
 #[tauri::command]
 #[specta::specta]
@@ -193,6 +220,7 @@ fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
         get_app_info,
         set_window_theme,
         run_admin_task,
+        open_folder,
     ])
 }
 
@@ -221,6 +249,19 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .manage(AppState::default())
         .invoke_handler(builder.invoke_handler())
+        .on_window_event(|window, event| {
+            // Closing mid-task would leave the user without the result (and WSL possibly down),
+            // so refuse and let the page explain why.
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event
+                && window
+                    .state::<AppState>()
+                    .admin_running
+                    .load(Ordering::Relaxed)
+            {
+                api.prevent_close();
+                let _ = window.emit(CLOSE_BLOCKED_EVENT, ());
+            }
+        })
         .setup(move |app| {
             builder.mount_events(app);
             if let Some(window) = app.get_webview_window("main") {

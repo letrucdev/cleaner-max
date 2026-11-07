@@ -169,7 +169,7 @@ fn file_size(path: &str) -> f64 {
 }
 
 fn system_drive_free() -> f64 {
-    let drive = std::env::var("SystemDrive").unwrap_or_else(|_| "C:".into());
+    let drive = crate::fsutil::system_drive();
     scan::overview()
         .disks
         .into_iter()

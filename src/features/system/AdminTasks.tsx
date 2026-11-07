@@ -1,9 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Container, HardDrive, Loader2, Minimize2, Moon, RefreshCw, ShieldCheck, TriangleAlert, type LucideIcon } from "lucide-react";
+import { Container, HardDrive, Minimize2, Moon, RefreshCw, ShieldCheck, TriangleAlert, type LucideIcon } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,6 +19,7 @@ import { api, queryKeys, useOverview, type AdminTask, type Overview } from "@/li
 import { formatBytes } from "@/lib/format";
 import { itemVariants, listVariants } from "@/lib/motion";
 import { cn } from "@/lib/utils";
+import { AdminTaskDialog, type AdminJob } from "./AdminTaskDialog";
 
 type Tone = "green" | "orange" | "gray";
 const pillTone: Record<Tone, string> = {
@@ -81,11 +81,11 @@ function useSpecs(o: Overview | undefined): Spec[] {
           id: "hibernate",
           icon: Moon,
           title: t("system.hibernate"),
-          desc: t("system.hibernateDesc"),
+          desc: t("system.hibernateDesc", { drive: o.systemDrive }),
           pill: { text: formatBytes(o.hiberfil), tone: "orange" },
           run: { label: t("system.turnOff"), task: { kind: "hibernateOff" }, warn: t("system.hibernateWarn") },
         }
-      : { id: "hibernate", icon: Moon, title: t("system.hibernate"), desc: t("system.hibernateDesc"), pill: { text: t("system.hibernateOff"), tone: "green" } },
+      : { id: "hibernate", icon: Moon, title: t("system.hibernate"), desc: t("system.hibernateDesc", { drive: o.systemDrive }), pill: { text: t("system.hibernateOff"), tone: "green" } },
   );
 
   specs.push({
@@ -101,7 +101,7 @@ function useSpecs(o: Overview | undefined): Spec[] {
       id: `sparse:${d.owner}`,
       icon: HardDrive,
       title: t("system.sparse", { distro: d.owner }),
-      desc: t("system.sparseDesc"),
+      desc: t("system.sparseDesc", { drive: o.systemDrive }),
       pill: d.sparse ? { text: t("system.sparseOn"), tone: "green" } : { text: t("system.sparseOff"), tone: "orange" },
       run: d.sparse ? undefined : { label: t("system.enable"), task: { kind: "setSparse", distro: d.owner }, warn: t("system.sparseWarn") },
     });
@@ -115,27 +115,21 @@ export function AdminTasks() {
   const queryClient = useQueryClient();
   const specs = useSpecs(overview.data);
   const [confirm, setConfirm] = useState<Spec | null>(null);
-  const [running, setRunning] = useState<string | null>(null);
+  const [job, setJob] = useState<AdminJob | null>(null);
+  const running = job !== null && job.outcome === undefined;
 
   async function run(spec: Spec) {
-    if (!spec.run) return;
-    setRunning(spec.id);
+    if (!spec.run || running) return;
+    setJob({ title: spec.title, startedAt: Date.now() });
+    let outcome: NonNullable<AdminJob["outcome"]>;
     try {
-      const r = await api.adminTask(spec.run.task);
-      if (r.status === "done") {
-        toast.success(r.freed > 0 ? t("system.doneFreed", { task: spec.title, size: formatBytes(r.freed) }) : t("system.done", { task: spec.title }));
-      } else if (r.status === "skipped") {
-        toast.info(r.message === "cancelled" ? t("system.cancelled") : (r.message ?? t("system.cancelled")));
-      } else {
-        toast.error(t("system.failed", { task: spec.title }), { description: r.message ?? undefined });
-      }
+      outcome = { result: await api.adminTask(spec.run.task) };
     } catch (e) {
-      toast.error(t("system.failed", { task: spec.title }), { description: String(e instanceof Error ? e.message : e) });
-    } finally {
-      setRunning(null);
-      void queryClient.invalidateQueries({ queryKey: queryKeys.overview });
-      void queryClient.invalidateQueries({ queryKey: queryKeys.history });
+      outcome = { error: String(e instanceof Error ? e.message : e) };
     }
+    setJob((j) => j && { ...j, outcome });
+    void queryClient.invalidateQueries({ queryKey: queryKeys.overview });
+    void queryClient.invalidateQueries({ queryKey: queryKeys.history });
   }
 
   return (
@@ -154,7 +148,6 @@ export function AdminTasks() {
         <motion.ul variants={listVariants} initial="initial" animate="enter" className="flex flex-col gap-2.5">
           {specs.map((s) => {
             const Icon = s.icon;
-            const busy = running === s.id;
             return (
               <motion.li variants={itemVariants} key={s.id} className="flex items-center gap-3.5 rounded-2xl border bg-card px-4 py-3.5 shadow-card">
                 <div aria-hidden className="flex size-9.5 shrink-0 items-center justify-center rounded-[10px] bg-fill">
@@ -170,12 +163,12 @@ export function AdminTasks() {
                 {s.run && (
                   <Button
                     variant="outline"
-                    disabled={running !== null}
+                    disabled={running}
                     onClick={() => setConfirm(s)}
-                    className="h-8.5 rounded-[9px] bg-card px-3.5 text-[13px] text-accent-text"
+                    className="h-8.5 shrink-0 rounded-[9px] bg-card px-3.5 text-[13px] text-accent-text"
                   >
-                    {busy ? <Loader2 className="animate-spin" /> : <ShieldCheck />}
-                    {busy ? t("system.running") : s.run.label}
+                    <ShieldCheck />
+                    {s.run.label}
                   </Button>
                 )}
               </motion.li>
@@ -213,6 +206,7 @@ export function AdminTasks() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <AdminTaskDialog job={job} onClose={() => setJob(null)} />
     </section>
   );
 }

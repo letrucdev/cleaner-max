@@ -48,7 +48,7 @@ function useCauses(o: Overview | undefined): Cause[] {
     size: d.size,
   }));
   if (o.hiberfil) {
-    causes.push({ key: "hiberfil", icon: Moon, title: t("overview.hibernate"), sub: "C:\\hiberfil.sys", pill: t("overview.hibernateOn"), tone: "gray", size: o.hiberfil });
+    causes.push({ key: "hiberfil", icon: Moon, title: t("overview.hibernate"), sub: `${o.systemDrive}\\hiberfil.sys`, pill: t("overview.hibernateOn"), tone: "gray", size: o.hiberfil });
   }
   if (o.recycleBin.size > 0) {
     causes.push({

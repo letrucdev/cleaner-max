@@ -14,6 +14,7 @@ App desktop **Windows native** (Tauri v2 + React 19) dọn dung lượng ổ C::
 2. **Ưu tiên thư viện có sẵn, chỉ tự viết khi không có thư viện phù hợp.**
    - Ngày giờ dùng `date-fns` (locale `vi`/`enUS`). Dung lượng dùng `filesize`. Gom nhóm/sắp xếp/debounce dùng `lodash-es`.
    - Animation dùng `motion` (`motion/react`). Component dùng shadcn/ui (`npx shadcn@latest add <name>`).
+   - **Tìm và dùng component shadcn/ui có sẵn trước khi tự viết.** Xem `src/components/ui` và các variant của nó trước (ví dụ đường dẫn bấm được thì dùng `<Button variant="link">`, không viết `<button>` trần). Chưa có thì tìm trong registry (skill `shadcn`, `npx shadcn@latest search`) rồi `add`. Chỉnh giao diện bằng `className`, vì `cn` tự ghi đè lớp xung đột (`h-8` thành `h-auto`, `px-2.5` thành `p-0`). Chỉ tự viết khi shadcn không có component phù hợp.
    - Bảng dùng `@tanstack/react-table` + `@tanstack/react-virtual`. Async gọi Rust dùng `@tanstack/react-query`. State dùng `zustand`. i18n dùng `i18next`.
    - Rust: quét dự án dùng `kondo-lib`; duyệt thư mục dùng `jwalk` + `rayon`; ổ đĩa/tiến trình dùng `sysinfo`; xóa dùng `remove_dir_all`; UAC dùng `runas`; vibrancy dùng `window-vibrancy`; bindings dùng `tauri-specta`.
 3. **Giao diện theo Apple HIG**: rõ ràng, tôn trọng nội dung, có chiều sâu (vibrancy/Mica). Dùng spring animation, tôn trọng `prefers-reduced-motion`. Contrast chữ ≥ 4.5:1. Hỗ trợ cả sáng lẫn tối. UI mặc định tiếng Việt, có tiếng Anh.

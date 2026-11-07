@@ -16,6 +16,7 @@ Design (đã duyệt, đã sửa theo góp ý): https://claude.ai/artifact/59vGL
 | 3 | 06/11/2026 | UI chính: token theo design, sidebar + Mica, Tổng quan, Cache dev, Dự án cũ, Rác Windows, luồng xác nhận/tiến trình, i18n vi/en, animation, mock IPC | ✅ Xong | [SESSION-03](docs/handoff/SESSION-03.md) |
 | 4 | 06/11/2026 | Tác vụ UAC (nén vhdx, sparse, Docker prune, hiberfil, DISM), Lịch sử, Cài đặt đầy đủ, rà soát animation, icon, bộ cài NSIS/MSI | ✅ Xong | [SESSION-04](docs/handoff/SESSION-04.md) |
 | 5 | 07/11/2026 | Commit + push GitHub, CI (build/fmt/clippy/test), release nháp theo tag `v*`, 16 skill mới, quy tắc tìm skill trên skills.sh | ✅ Xong | [SESSION-05](docs/handoff/SESSION-05.md) |
+| 6 | 07/11/2026 | Ổ hệ thống lấy từ `%SystemDrive%`, dialog tiến trình tác vụ Admin (chặn chuyển trang + đóng app), mở thư mục dự án, sửa layout bảng Dự án cũ và padding trang Hệ thống | ✅ Xong (chưa thử app thật) | [SESSION-06](docs/handoff/SESSION-06.md) |
 
 ## Liên kết nhanh
 - Kế hoạch: [docs/PLAN.md](docs/PLAN.md)

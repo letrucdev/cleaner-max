@@ -1,6 +1,6 @@
 [package]
 name = "cleaner-max"
-version = "0.1.0"
+version = "0.2.0"
 description = "Cleaner Max — dọn dung lượng Windows, WSL và Docker"
 authors = ["letrucdev"]
 edition = "2024"

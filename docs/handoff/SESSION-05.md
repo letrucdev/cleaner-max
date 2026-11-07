@@ -49,9 +49,11 @@
 - `cargo test`: 32 qua, 1 bỏ qua (smoke test).
 - `npm run build`: thành công.
 
-Workflow release chưa chạy thật, vì chưa push tag nào.
+Trên GitHub:
+- CI chạy ở lần push đầu và qua hết: https://github.com/letrucdev/cleaner-max/actions/runs/42359910114
+- Tag `v0.1.0` chạy workflow release thành công, tạo Release nháp có bộ cài NSIS + MSI: https://github.com/letrucdev/cleaner-max/actions/runs/42360534996
 
 ## Việc tiếp theo
-- Push tag `v0.1.0` để thử workflow release, rồi xem bản nháp trên GitHub.
+- Người dùng xem lại Release nháp `v0.1.0` rồi bấm Publish.
 - Tùy chọn: bật hook `git-guardrails-claude-code`, thêm Vitest/Playwright cho frontend, thêm `tauri-plugin-updater` cùng khóa ký.
 - Vẫn còn từ phiên 4: người dùng chạy thật các tác vụ Admin.
